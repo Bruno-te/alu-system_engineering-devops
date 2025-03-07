@@ -1,21 +1,21 @@
-#!/usr/bin/env bash
-# Installs Nginx with the following configurations:
-#+    Listens on port 8i0.
-#+    Returns a page containing "Holberton School" when queried
-#+     at the root with a curl GET request.
-# Configures /redirect_me as a "301 Moved Permanently".
-# Includes a custom 404 page containing "Ceci n'est pas une page".
+#!/bin/bash
 
-sudo apt-get update -y;
-sudo apt-get install -y nginx;
-sudo apt-get install -y ufw;
+# Step 1: Create the custom 404 page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html > /dev/null
 
-sudo ufw enable;
-sudo ufw allow 'Nginx HTTP';
-sudo ufw allow 'OpenSSH';
+# Step 2: Modify the Nginx configuration to use the custom 404 page
+sudo bash -c 'cat <<EOT >> /etc/nginx/sites-available/default
 
-echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html;
+error_page 404 /404.html;
+location = /404.html {
+    root /var/www/html;
+    internal;
+}
+EOT'
 
-sudo cp ./nginx.conf /etc/nginx/sites-enabled/default;
+# Step 3: Test the Nginx configuration for syntax errors
+sudo nginx -t
 
-sudo service nginx restart;
+# Step 4: Restart Nginx to apply the changes
+sudo systemctl restart nginx
+
