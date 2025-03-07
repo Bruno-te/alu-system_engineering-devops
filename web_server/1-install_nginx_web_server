@@ -1,13 +1,21 @@
 #!/usr/bin/env bash
-# JDI
-sudo apt-get update -y;
-sudo apt-get install -y nginx;
-sudo apt-get install -y ufw;
+# Installs Nginx with the following configurations:
+#+    Listens on port 80.
+#+    Returns a page containing "Holberton School" when queried
+#++    at the root with a curl GET request.
 
-sudo ufw enable;
-sudo ufw allow 'Nginx HTTP';
-sudo ufw allow 'OpenSSH';
+apt-get update
+apt-get install -y nginx
 
-sudo cp ./nginx.conf /etc/nginx/sites-enabled/default;
+mkdir /etc/nginx/html
+touch /etc/nginx/html/index.html
+echo "Holberton School" > /etc/nginx/html/index.html
+printf %s "server {
+     listen      80 default_server;
+     listen      [::]:80 default_server;
+     root        /etc/nginx/html;
+     index       index.html index.htm;
+}
+" > /etc/nginx/sites-available/default
 
-sudo service nginx restart;
+service nginx restart
