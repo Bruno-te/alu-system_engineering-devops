@@ -1,17 +1,26 @@
 #!/usr/bin/env bash
-#Installing Nginx and configuring it
-sudo apt update -y # update package manager to get latest updates when installing ngi..
-sudo apt install nginx -y # instal nginx
-new_config=\
-"server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-		root /var/www/html;
-	index index.html index.html index.nginx-debian.html;
-	server_name _;
-	add_header X-Served-By $HOSTNAME;
-}
-"
-sudo chown -R "$USER":"$USER" /etc/nginx/sites-available/default # change ownership
-echo "$new_config" > /etc/nginx/sites-available/default # overwrite the existing configuration
-sudo service nginx restart # restart the nginx
+
+# This script installs and configures Nginx to return a custom X-Served-By header with the server's hostname
+
+# Exit on any error
+set -e
+
+# Install Nginx if not installed
+if ! command -v nginx &> /dev/null; then
+    sudo apt update
+    sudo apt install -y nginx
+fi
+
+# Get the server's hostname
+HOSTNAME=$(hostname)
+
+# Configure Nginx to include the custom header
+CONFIG_FILE="/etc/nginx/sites-available/default"
+sudo sed -i '/server_name _;/a \tadd_header X-Served-By "$HOSTNAME";' "$CONFIG_FILE"
+
+# Restart Nginx to apply changes
+sudo systemctl restart nginx
+
+# Ensure Nginx is running
+sudo systemctl enable nginx
+
