@@ -13,4 +13,3 @@ sed -i '/error_page 404 \/404.html;/c\    error_page 404 \/custom_404.html;' /et
 
 # Restart nginx (not using systemctl)
 service nginx restart
-"

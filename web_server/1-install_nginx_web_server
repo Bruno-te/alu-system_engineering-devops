@@ -10,4 +10,3 @@ echo 'Holberton School for the win!' > /var/www/html/index.nginx-debian.html
 
 # Start nginx using service command (not systemctl)
 service nginx start
-t

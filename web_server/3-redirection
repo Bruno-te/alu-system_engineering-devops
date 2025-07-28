@@ -10,4 +10,3 @@ sed -i '/location \/ {/a \\n\tlocation /redirect_me {\n\t\treturn 301 https://ww
 
 # Restart nginx using service (not systemctl)
 service nginx restart
-t
