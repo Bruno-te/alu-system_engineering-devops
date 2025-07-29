@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
-# Fix Holbertonschool server with this command
-echo "ServerName 127.0.0.1" >> /etc/apache2/apache2.conf
+
+docker run -p 8080:80 -d -it holbertonschool/265-0
+
+docker exec -it <container_id> /bin/bash
+
+apt-get update
+apt-get install -y apache2
+
+echo "Hello Holberton" > /var/www/html/index.html
+
+
 service apache2 start
+
+exit
+curl 0:8080
