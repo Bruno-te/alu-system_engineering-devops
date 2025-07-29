@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
 # Fix Holbertonschool server with this command
-
-# Set a ServerName to avoid Apache startup warning
 echo "ServerName 127.0.0.1" >> /etc/apache2/apache2.conf
-
-# Start Apache
 service apache2 start
-
-# Output expected message
-echo "apache2 is running"
