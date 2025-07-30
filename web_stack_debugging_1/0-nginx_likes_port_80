@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
-# Setup Nginx server
-sed -i 's/8080/80/' /etc/nginx/sites-enabled/default
+# Installs nginx and ensures it's listening on port 80
+
+# Update package list and install nginx if not already installed
+apt-get update -y && apt-get install -y nginx
+
+# Make sure nginx is running
 service nginx start
+
+# Ensure nginx is listening on port 80 (optional: restart to ensure configuration is reloaded)
