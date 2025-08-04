@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # This script installs and runs nginx on port 8080 as the 'nginx' user
+
 # Install nginx if it's not installed
-command -v nginx >/dev/null 2>&1 || {
+if ! command -v nginx >/dev/null 2>&1; then
     echo "Installing nginx..."
     apk update && apk add nginx
-}
+fi
 
 # Create web root with a test index.html
 mkdir -p /var/www/html
@@ -12,8 +13,11 @@ echo "<h1>Welcome to nginx on port 8080</h1>" > /var/www/html/index.html
 
 # Kill any process using port 80 to avoid conflicts
 echo "Checking and freeing up port 80..."
+# shellcheck disable=SC2009  # Allow grep of netstat output safely here
 PORT_80_PID=$(netstat -tulpn 2>/dev/null | grep ":80 " | awk '{print $7}' | cut -d/ -f1)
-[ -n "$PORT_80_PID" ] && kill -9 $PORT_80_PID
+if [ -n "$PORT_80_PID" ]; then
+    kill -9 "$PORT_80_PID"
+fi
 
 # Ensure nginx runs as the 'nginx' user
 sed -i 's/^user .*/user nginx;/' /etc/nginx/nginx.conf
