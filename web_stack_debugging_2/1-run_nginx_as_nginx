@@ -1,46 +1,21 @@
-#!/usr/bin/env bash
-# This script installs nginx and configures it to run as the nginx user on port 8080
+#!/bin/bash
+# Configure nginx to run as user nginx and listen on all IPs on port 8080
 
-# Install nginx if not installed
-if ! command -v nginx >/dev/null 2>&1; then
-    apk update
-    apk add nginx
-fi
-
-# Create web root directory and a simple index.html
-mkdir -p /var/www/html
-echo "<h1>Welcome to nginx on port 8080</h1>" > /var/www/html/index.html
-
-# Stop any process listening on port 8080
-pid=$(netstat -tulpn 2>/dev/null | grep ':8080 ' | awk '{print $7}' | cut -d'/' -f1)
-if [ -n "$pid" ]; then
-    kill -9 "$pid"
-fi
-
-# Set nginx to run as 'nginx' user
+# Edit nginx.conf: change user to nginx
 sed -i 's/^user .*/user nginx;/' /etc/nginx/nginx.conf
 
-# Configure nginx to listen on port 8080 and serve the correct root
-cat > /etc/nginx/http.d/default.conf << EOF
-server {
-    listen 8080 default_server;
-    listen [::]:8080 default_server;
+# Edit default site config or main config to listen on port 8080 on all IPs
+# Assuming default server config is at /etc/nginx/conf.d/default.conf or /etc/nginx/sites-enabled/default
+# Try both common paths and replace 'listen 80;' with 'listen 8080;'
+if [ -f /etc/nginx/conf.d/default.conf ]; then
+  sed -i 's/listen 80;/listen 8080;/' /etc/nginx/conf.d/default.conf
+elif [ -f /etc/nginx/sites-enabled/default ]; then
+  sed -i 's/listen 80;/listen 8080;/' /etc/nginx/sites-enabled/default
+else
+  # fallback: update all listen directives from 80 to 8080 in /etc/nginx/nginx.conf and included files
+  find /etc/nginx -type f -name '*.conf' -exec sed -i 's/listen 80;/listen 8080;/' {} +
+fi
 
-    root /var/www/html;
-    index index.html;
+# Reload nginx to apply changes
+nginx -s reload
 
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-}
-EOF
-
-# Stop any existing nginx process
-pkill nginx 2>/dev/null || true
-
-# Start nginx
-nginx
-
-# Wait a second and verify nginx is running and listening on port 8080 as 'nginx' user
-sleep 1
-curl -s -o /dev/null -w "%{http_code}\n" 127.0.0.1:8080
