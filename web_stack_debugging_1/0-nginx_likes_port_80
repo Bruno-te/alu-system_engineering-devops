@@ -1,28 +1,19 @@
 #!/usr/bin/env bash
-# Configure Nginx to serve Hello Holberton on port 80
+# Configures Nginx to return 'Hello Holberton' and HTTP 200 on port 80
 
-# Backup default config
-mv /etc/nginx/http.d/default.conf /etc/nginx/http.d/default.conf.bak
-
-# Create new config
-cat << EOF > /etc/nginx/http.d/default.conf
+# Create a custom Nginx config file
+cat << 'EOF' > /etc/nginx/http.d/default.conf
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
-    root /var/lib/nginx/html;
-    index index.html;
-
     location / {
-        try_files \$uri \$uri/ =404;
+        default_type text/plain;
+        return 200 'Hello Holberton';
     }
 }
 EOF
 
-# Create the page to serve
-mkdir -p /var/lib/nginx/html
-echo "Hello Holberton" > /var/lib/nginx/html/index.html
-
-# Reload nginx to apply changes
-nginx -s reload
+# Reload Nginx to apply new config
+nginx -s reload || nginx
 
