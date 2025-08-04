@@ -1,32 +1,15 @@
 #!/usr/bin/env bash
-# Sets up Nginx to return 'Hello Holberton' and HTTP 200 on port 80
+# This script configures Nginx to listen on port 80 of all active IPv4 IP
 
-# Install nginx if not already installed
+# Install Nginx
 apk update
-apk add --no-cache nginx
+apk add nginx
 
-# Create HTML content
-echo "Hello Holberton" > /var/lib/nginx/html/index.html
+# Create index.html with the required content
+echo "Hello Holberton" > /var/www/localhost/htdocs/index.html
 
-# Create default server config
-cat << EOF > /etc/nginx/http.d/default.conf
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+# Start Nginx
+nginx
 
-    root /var/lib/nginx/html;
-    index index.html;
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-}
-EOF
-
-# Reload Nginx if already running, else start it
-if pgrep nginx > /dev/null; then
-    nginx -s reload
-else
-    nginx
-fi
-
+# Reload to apply any config changes
+nginx -s reload
