@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # This script installs and runs nginx on port 8080 as the 'nginx' user
 # Install nginx if it's not installed
 command -v nginx >/dev/null 2>&1 || {
