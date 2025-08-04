@@ -1,19 +1,32 @@
 #!/usr/bin/env bash
-# Configures Nginx to return 'Hello Holberton' and HTTP 200 on port 80
+# Sets up Nginx to return 'Hello Holberton' and HTTP 200 on port 80
 
-# Create a custom Nginx config file
-cat << 'EOF' > /etc/nginx/http.d/default.conf
+# Install nginx if not already installed
+apk update
+apk add --no-cache nginx
+
+# Create HTML content
+echo "Hello Holberton" > /var/lib/nginx/html/index.html
+
+# Create default server config
+cat << EOF > /etc/nginx/http.d/default.conf
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
+    root /var/lib/nginx/html;
+    index index.html;
+
     location / {
-        default_type text/plain;
-        return 200 'Hello Holberton';
+        try_files \$uri \$uri/ =404;
     }
 }
 EOF
 
-# Reload Nginx to apply new config
-nginx -s reload || nginx
+# Reload Nginx if already running, else start it
+if pgrep nginx > /dev/null; then
+    nginx -s reload
+else
+    nginx
+fi
 
