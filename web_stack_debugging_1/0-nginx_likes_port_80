@@ -1,12 +1,28 @@
 #!/usr/bin/env bash
+# Configure Nginx to serve Hello Holberton on port 80
 
-apk update
-apk add nginx
+# Backup default config
+mv /etc/nginx/http.d/default.conf /etc/nginx/http.d/default.conf.bak
 
+# Create new config
+cat << EOF > /etc/nginx/http.d/default.conf
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/lib/nginx/html;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+}
+EOF
+
+# Create the page to serve
+mkdir -p /var/lib/nginx/html
 echo "Hello Holberton" > /var/lib/nginx/html/index.html
 
-nginx
-
-
-
+# Reload nginx to apply changes
+nginx -s reload
 
